@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patient Tracking & Scheduling System</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #f4f6f8;
+      color: #222;
+    }
+
+    header {
+      background: #1f4e79;
+      color: white;
+      padding: 24px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      font-size: 15px;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      color: #1f4e79;
+      font-size: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    input,
+    select,
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    button {
+      background: #1f4e79;
+      color: white;
+      border: none;
+      margin-top: 16px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #163a59;
+    }
+
+    .secondary-button {
+      background: #666;
+    }
+
+    .secondary-button:hover {
+      background: #444;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      border-left: 5px solid #1f4e79;
+    }
+
+    .status {
+      margin-top: 12px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .success {
+      color: green;
+    }
+
+    .error {
+      color: #b00020;
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .summary-box {
+      background: #eef4fa;
+      padding: 18px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .summary-box strong {
+      display: block;
+      font-size: 28px;
+      color: #1f4e79;
+    }
+
+    @media (max-width: 800px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Patient Tracking & Scheduling System</h1>
+    <p>A simple web-based prototype for managing patients and appointments.</p>
+  </header>
+
+  <main>
+    <section class="card full-width">
+      <h2>System Overview</h2>
+      <div class="summary-grid">
+        <div class="summary-box">
+          <strong id="patientCount">0</strong>
+          Patients
+        </div>
+        <div class="summary-box">
+          <strong id="appointmentCount">0</strong>
+          Appointments
+        </div>
+        <div class="summary-box">
+          <strong>Local</strong>
+          Browser Storage
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Add Patient</h2>
+      <label for="patientName">Patient Name</label>
+      <input type="text" id="patientName" placeholder="Example: John Smith" />
+
+      <label for="patientAge">Age</label>
+      <input type="number" id="patientAge" placeholder="Example: 45" />
+
+      <label for="patientReason">Reason for Visit</label>
+      <input type="text" id="patientReason" placeholder="Example: Follow-up visit" />
+
+      <button onclick="addPatient()">Add Patient</button>
+      <p id="patientStatus" class="status"></p>
+    </section>
+
+    <section class="card">
+      <h2>Schedule Appointment</h2>
+      <label for="patientSelect">Select Patient</label>
+      <select id="patientSelect">
+        <option value="">No patients available</option>
+      </select>
+
+      <label for="appointmentDate">Appointment Date</label>
+      <input type="date" id="appointmentDate" />
+
+      <label for="appointmentTime">Appointment Time</label>
+      <input type="time" id="appointmentTime" />
+
+      <button onclick="scheduleAppointment()">Schedule Appointment</button>
+      <p id="appointmentStatus" class="status"></p>
+    </section>
+
+    <section class="card">
+      <h2>Current Patients</h2>
+      <ul id="patientList"></ul>
+    </section>
+
+    <section class="card">
+      <h2>Scheduled Appointments</h2>
+      <ul id="appointmentList"></ul>
+    </section>
+
+    <section class="card full-width">
+      <h2>Maintenance / Demo Controls</h2>
+      <p>This button clears browser storage and resets the prototype for another demo.</p>
+      <button class="secondary-button" onclick="clearData()">Clear Demo Data</button>
+    </section>
+  </main>
+
+  <script>
+    let patients = JSON.parse(localStorage.getItem("patients")) || [];
+    let appointments = JSON.parse(localStorage.getItem("appointments")) || [];
+
+    function saveData() {
+      localStorage.setItem("patients", JSON.stringify(patients));
+      localStorage.setItem("appointments", JSON.stringify(appointments));
+    }
+
+    function addPatient() {
+      const name = document.getElementById("patientName").value.trim();
+      const age = document.getElementById("patientAge").value.trim();
+      const reason = document.getElementById("patientReason").value.trim();
+      const status = document.getElementById("patientStatus");
+
+      if (!name || !age || !reason) {
+        status.textContent = "Please complete all patient fields.";
+        status.className = "status error";
+        return;
+      }
+
+      const patient = {
+        id: Date.now(),
+        name: name,
+        age: age,
+        reason: reason
+      };
+
+      patients.push(patient);
+      saveData();
+      updateDisplay();
+
+      document.getElementById("patientName").value = "";
+      document.getElementById("patientAge").value = "";
+      document.getElementById("patientReason").value = "";
+
+      status.textContent = "Patient added successfully.";
+      status.className = "status success";
+    }
+
+    function scheduleAppointment() {
+      const patientId = document.getElementById("patientSelect").value;
+      const date = document.getElementById("appointmentDate").value;
+      const time = document.getElementById("appointmentTime").value;
+      const status = document.getElementById("appointmentStatus");
+
+      if (!patientId || !date || !time) {
+        status.textContent = "Please select a patient, date, and time.";
+        status.className = "status error";
+        return;
+      }
+
+      const patient = patients.find(p => p.id == patientId);
+
+      const appointment = {
+        id: Date.now(),
+        patientName: patient.name,
+        date: date,
+        time: time
+      };
+
+      appointments.push(appointment);
+      saveData();
+      updateDisplay();
+
+      document.getElementById("appointmentDate").value = "";
+      document.getElementById("appointmentTime").value = "";
+
+      status.textContent = "Appointment scheduled successfully.";
+      status.className = "status success";
+    }
+
+    function updateDisplay() {
+      const patientList = document.getElementById("patientList");
+      const appointmentList = document.getElementById("appointmentList");
+      const patientSelect = document.getElementById("patientSelect");
+
+      patientList.innerHTML = "";
+      appointmentList.innerHTML = "";
+      patientSelect.innerHTML = "";
+
+      document.getElementById("patientCount").textContent = patients.length;
+      document.getElementById("appointmentCount").textContent = appointments.length;
+
+      if (patients.length === 0) {
+        patientList.innerHTML = "<li>No patients added yet.</li>";
+        patientSelect.innerHTML = "<option value=''>No patients available</option>";
+      } else {
+        patientSelect.innerHTML = "<option value=''>Select a patient</option>";
+        patients.forEach(patient => {
+          const li = document.createElement("li");
+          li.textContent = `${patient.name} | Age: ${patient.age} | Reason: ${patient.reason}`;
+          patientList.appendChild(li);
+
+          const option = document.createElement("option");
+          option.value = patient.id;
+          option.textContent = patient.name;
+          patientSelect.appendChild(option);
+        });
+      }
+
+      if (appointments.length === 0) {
+        appointmentList.innerHTML = "<li>No appointments scheduled yet.</li>";
+      } else {
+        appointments.forEach(appointment => {
+          const li = document.createElement("li");
+          li.textContent = `${appointment.patientName} | ${appointment.date} at ${appointment.time}`;
+          appointmentList.appendChild(li);
+        });
+      }
+    }
+
+    function clearData() {
+      patients = [];
+      appointments = [];
+      saveData();
+      updateDisplay();
+      document.getElementById("patientStatus").textContent = "Demo data cleared.";
+      document.getElementById("patientStatus").className = "status success";
+      document.getElementById("appointmentStatus").textContent = "";
+    }
+
+    updateDisplay();
+  </script>
+</body>
+</html>
