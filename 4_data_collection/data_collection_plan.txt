@@ -1,0 +1,28 @@
+Data Collection Plan
+
+The system collects patient and appointment data through user input.
+
+Data Sources:
+- Patient name
+- Patient age
+- Reason for visit
+- Appointment date
+- Appointment time
+
+Data Storage:
+- Data is stored locally in the user's browser using local storage
+- No external database is used in this prototype
+
+Data Handling:
+- Data is entered manually by the user
+- The system validates that required fields are completed before submission
+- Data persists after page refresh unless cleared by the user
+
+Data Limitations:
+- Data is not shared across users or devices
+- Data is not permanently stored outside of the browser
+
+Future Improvements:
+- Integration with a centralized database
+- Secure storage of patient information
+- Role-based access for different users
