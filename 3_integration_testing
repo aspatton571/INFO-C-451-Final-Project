@@ -1,1 +1,17 @@
-3_integration_testing/README3.txt
+Integration Testing Plan
+
+The purpose of integration testing is to confirm that different components of the system work together correctly.
+
+Test Case 1: Add Patient + Schedule Appointment
+  Add a new patient
+  Schedule an appointment for that patient
+  Expected Result: Patient appears in scheduling and appointment is created
+
+Test Case 2: Data Storage
+  Add patient and appointment
+  Refresh page
+  Expected Result: Data remains available using local storage
+
+Test Case 3: View Appointments
+  Schedule multiple appointments
+  Expected Result: All appointments display correctly
