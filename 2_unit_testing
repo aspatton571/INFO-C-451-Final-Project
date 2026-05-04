@@ -1,1 +1,19 @@
-2_unit_testing/README2.txt
+Unit Testing Plan
+
+The purpose of unit testing is to test the components of the system to ensure they function correctly.
+
+Test Case 1: Add Patient
+  Input: Valid patient information
+  Expected Result: Patient is added to the system
+
+Test Case 2: View Patients
+  Input: Existing patient list
+  Expected Result: All patients are displayed correctly
+
+Test Case 3: Schedule Appointment
+  Input: Valid patient and appointment details
+  Expected Result: Appointment is successfully scheduled
+
+Test Case 4: Input Validation
+  Input: Missing required fields
+  Expected Result: System displays an error message
